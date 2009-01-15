@@ -1,0 +1,13 @@
+# Basic family tree relationships..
+sibling[:X,:Y] <<= [ parent[:Z,:X], parent[:Z,:Y], noteq[:X,:Y] ]
+mother[:X,:Y] <<= [parent[:X, :Y], female[:X]]
+father[:X,:Y] <<= [parent[:X, :Y], male[:X]]
+grandparent[:G,:C] <<= [ parent[:G,:P], parent[:P,:C]]
+cousin[:A, :B] <<= [parent[:X, :A], parent[:Y, :B], sibling[:X, :Y], noteq[:A, :B]]
+ancestor[:A, :C] <<= [parent[:A, :X], parent[:X, :B]]
+mothers[:M, :C] <<= mother[:M, :C]
+mothers[:M, :C] <<= [mother[:M, :X], mothers[:X, :C]]
+fathers[:F, :C] <<= father[:F, :C]
+fathers[:F, :C] <<= [father[:F, :X], fathers[:X, :C]]
+widower[:W] <<= [married[:W, :X], deceased[:X], nl[deceased[:W]]]
+widower[:W] <<= [married[:X, :W], deceased[:X], nl[deceased[:W]]]
