@@ -1,0 +1,9 @@
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/ruby_prolog
+lib/ruby_prolog.rb
+spec/ruby_prolog_spec.rb
+spec/spec_helper.rb
+test/test_ruby_prolog.rb
