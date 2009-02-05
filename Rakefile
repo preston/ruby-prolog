@@ -1,5 +1,5 @@
 require 'echoe'  
-Echoe.new("ruby_prolog") do |p|
+Echoe.new("ruby-prolog") do |p|
     p.author = "Preston Lee"
     p.summary = "A Prolog-ish Ruby DSL."
     p.url = "http://www.openrain.com.com"
