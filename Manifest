@@ -1,12 +1,9 @@
 History.txt
-lib/family_tree/facts.rb
-lib/family_tree/rules.rb
-lib/family_tree.rb
 lib/ruby_prolog/tiny_prolog.rb
 lib/ruby_prolog.rb
-Manifest.txt
+Manifest
 Rakefile
 README.txt
 spec/ruby_prolog_spec.rb
 spec/spec_helper.rb
-Manifest
+
