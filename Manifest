@@ -1,5 +1,5 @@
 History.txt
-lib/ruby_prolog/tiny_prolog.rb
+lib/ruby_prolog/ruby_prolog.rb
 lib/ruby_prolog.rb
 Manifest
 Rakefile
