@@ -1,13 +1,9 @@
 # Based on tiny_prolog h18.9/8
 
 module RubyProlog
-  
-  # def pred(x)
-  #     return Pred.new(x)
-  # end
 
   
-  class Pred
+  class Predicate
   
     attr_reader :defs
 
@@ -17,8 +13,7 @@ module RubyProlog
     end
 
     def inspect
-      # p @name.class.to_s
-      return @name #.to_s +'foobies'
+      return @name.to_s
     end
 
     def [](*args)
@@ -26,7 +21,6 @@ module RubyProlog
     end
 
     def []=(*a); end
-
    
   end
 
@@ -96,7 +90,7 @@ module RubyProlog
 
 
 
-  class Env
+  class Environment
 
     def initialize
       @table = {}
@@ -142,7 +136,7 @@ module RubyProlog
   end
 
 
-  class CallbackEnv
+  class CallbackEnvironment
   
     def initialize(env, trail)
       @env, @trail = env, trail
@@ -210,7 +204,7 @@ module RubyProlog
     
     
     def resolve(*goals)
-      env = Env.new
+      env = Environment.new
       _resolve_body(list(*goals), env, [false]) {
         yield env
       }
@@ -228,7 +222,7 @@ module RubyProlog
           }
           cut[0] = true
         else
-          d_env = Env.new
+          d_env = Environment.new
           d_cut = [false]
           require 'pp'
           # pp 'G ' + goal.class.to_s
@@ -239,7 +233,7 @@ module RubyProlog
             trail = []
             if _unify_(goal, env, d_head, d_env, trail, d_env)
               if Proc === d_body
-                if d_body[CallbackEnv.new(d_env, trail)]
+                if d_body[CallbackEnvironment.new(d_env, trail)]
                   _resolve_body(rest, env, cut) {
                     yield
                   }
@@ -279,21 +273,24 @@ module RubyProlog
 
     def query(*goals)
       count = 0
-      printout = proc {|x|
-        x = x[0] if x.length == 1
-        printf "%d %s\n", count, x.inspect
-      }
+      results = Array.new
+      # printout = proc {|x|
+      #   x = x[0] if x.length == 1
+      #   printf "%d %s\n", count, x.inspect
+      # }
       resolve(*goals) {|env|
         count += 1
-        printout[env[goals]]
+        results << env[goals]
+        # printout[env[goals]]
       }
-      printout[goals] if count == 0
+      # printout[goals] if count == 0
+      return results
     end
   
   
     def is(*syms,&block)
       $is_cnt ||= 0
-      is = Pred.new "IS_#{$is_cnt += 1}"
+      is = Predicate.new "IS_#{$is_cnt += 1}"
       raise "At least one symbol needed" unless syms.size > 0
       is[*syms].calls do |env|
         value = block.call(*syms[1..-1].map{|x| env[x]})
@@ -304,7 +301,7 @@ module RubyProlog
 
     def method_missing(meth, *args)
         # puts "NEW PRED #{meth} #{meth.class}"
-        pred = Pred.new(meth)
+        pred = Predicate.new(meth)
         # proc = Proc.new {pred}
 
 
@@ -342,7 +339,7 @@ module RubyProlog
   
     def initialize
       # We do not need to predefine predicates like this because they will automatically be defined for us.
-      # write = Pred.new "write"
+      # write = Predicate.new "write"
       write[:X].calls{|env| print env[:X]; true}
       writenl[:X].calls{|env| puts env[:X]; true}
       nl[:X].calls{|e| puts; true}
@@ -350,13 +347,13 @@ module RubyProlog
       noteq[:X,:Y].calls{|env| env[:X] != env[:Y]}
       atomic[:X].calls do |env|
         case env[:X]
-        when Symbol, Pred, Goal; false
+        when Symbol, Predicate, Goal; false
         else true
         end
       end
       notatomic[:X].calls do |env|
         case env[:X]
-        when Symbol, Pred, Goal; true
+        when Symbol, Predicate, Goal; true
         else false
         end
       end

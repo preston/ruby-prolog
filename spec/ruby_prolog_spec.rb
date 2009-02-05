@@ -14,39 +14,37 @@ describe RubyProlog do
     # We'll create numerous instances of the engine and assert they do not interfere with each other.
      one = RubyProlog::Core.new
      one.instance_eval do
-       male[:preston].fact
-       query(male[:X])
+       query(male[:X]).length.should == 0
      end
 
      two = RubyProlog::Core.new
      two.instance_eval do
        male[:preston].fact
-       query(male[:X])
+       query(male[:X]).length.should == 1
      end
      
      three = RubyProlog::Core.new
      three.instance_eval do
-       male[:preston].fact
-       query(male[:X])
+       query(male[:X]).length.should == 0
+     end
+     
+     one.instance_eval do
+       query(male[:X]).length.should == 0
      end
 
   end
   
 
-  it 'needs to actually assert stuff!!!' do
+
+  it 'should be able to query simple family trees.' do
 
     c = RubyProlog::Core.new
     c.instance_eval do
-      # ft = File.expand_path(File.join(File.dirname(__FILE__), %w[.. lib family_tree]))
-      #       p ft
-      #       require ft
-      
       # Basic family tree relationships..
       sibling[:X,:Y] <<= [ parent[:Z,:X], parent[:Z,:Y], noteq[:X,:Y] ]
       mother[:X,:Y] <<= [parent[:X, :Y], female[:X]]
       father[:X,:Y] <<= [parent[:X, :Y], male[:X]]
       grandparent[:G,:C] <<= [ parent[:G,:P], parent[:P,:C]]
-      cousin[:A, :B] <<= [parent[:X, :A], parent[:Y, :B], sibling[:X, :Y], noteq[:A, :B]]
       ancestor[:A, :C] <<= [parent[:A, :X], parent[:X, :B]]
       mothers[:M, :C] <<= mother[:M, :C]
       mothers[:M, :C] <<= [mother[:M, :X], mothers[:X, :C]]
@@ -54,7 +52,7 @@ describe RubyProlog do
       fathers[:F, :C] <<= [father[:F, :X], fathers[:X, :C]]
       widower[:W] <<= [married[:W, :X], deceased[:X], nl[deceased[:W]]]
       widower[:W] <<= [married[:X, :W], deceased[:X], nl[deceased[:W]]]
-      
+
       # Basic parents relationships as could be stored in a typical relational database.
       parent['Ms. Old', 'Marge'].fact
 
@@ -115,33 +113,82 @@ describe RubyProlog do
       interest['Ron', 'Walks'].fact
       interest['Marcia', 'Walks'].fact
       
-      
-      
-      
       # Runs some queries..
-      p "Who are Silas's parents?"
-      query(parent[:P, 'Silas'])
+      
+      # p "Who are Silas's parents?"
+      # Silas should have two parents: Matt and Julie.
+      r = query(parent[:P, 'Silas'])
+      r.length.should == 2
+      r[0][0].args[0].should == 'Matt'
+      r[1][0].args[0].should == 'Julie'
+      
+      # p "Who is married?"
+      # We defined 5 married facts.
+      query(married[:A, :B]).length.should == 5
+        
+      # p 'Are Karen and Julie siblings?'
+      # Yes, through two parents.
+      query(sibling['Karen', 'Julie']).length.should == 2
+      
+      
+      # p "Who likes to play games?"
+      # Four people.
+      query(interest[:X, 'Games']).length.should == 4
+      
+      
+      # p "Who likes to play checkers?"
+      # Nobody.
+      query(interest[:X, 'Checkers']).length.should == 0
 
-      p 'Are Karen and Julie siblings?'
-      query(sibling['Karen', 'Julie'])
+      # p "Who are Karen's ancestors?"
+      # query(ancestor[:A, 'Karen'])
 
-      p "Who are cousins?"
-      query(cousin[:A, :B])
-
-      p "Who likes to play games?"
-      query(interest[:X, 'Games'])
-
-      p "Who are Karen's ancestors?"
-      query(ancestor[:A, 'Karen'])
-
-      p "Who is married?"
-      query(married[:A, :B])
-
-      p "What grandparents are also widowers?"
-      query(widower[:X], grandparent[:X, :C])
+      # p "What grandparents are also widowers?"
+      # Marge, twice, because of two grandchildren.
+      query(widower[:X], grandparent[:X, :G]).length.should == 2
     end
 
   end
 
+
+  it 'should be able to query simple family trees.' do
+
+    c = RubyProlog::Core.new
+    c.instance_eval do
+
+      vendor['dell'].fact
+      vendor['apple'].fact
+      
+      model['ultrasharp'].fact
+      model['xps'].fact
+      model['macbook'].fact
+      model['iphone'].fact
+      
+      manufactures['dell', 'ultrasharp'].fact
+      manufactures['dell', 'xps'].fact
+      manufactures['apple', 'macbook'].fact
+      manufactures['apple', 'iphone'].fact
+      
+      is_a['xps', 'laptop'].fact
+      is_a['macbook', 'laptop'].fact
+      is_a['ultrasharp', 'monitor'].fact
+      is_a['iphone', 'phone'].fact
+      
+      kind['laptop']
+      kind['monitor']
+      kind['phone']
+      
+      model[:M] <<= [manfactures[:V, :M]]
+      
+      vendor_of[:V, :K] <<= [vendor[:V], manufactures[:V, :M], is_a[:M, :K]]
+      # not_vendor_of[:V, :K] <<= [vendor[:V], nl[vendor_of[:V, :K]]]
+
+      query(is_a[:K, 'laptop']).length == 2
+      query(vendor_of[:V, 'phone']) == 1
+      # pp query(not_vendor_of[:V, 'phone'])
+    end
+    
+  end
+  
 
 end
