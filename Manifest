@@ -3,7 +3,6 @@ lib/family_tree/facts.rb
 lib/family_tree/rules.rb
 lib/family_tree.rb
 lib/ruby_prolog/tiny_prolog.rb
-lib/ruby_prolog/tiny_prolog_ext.rb
 lib/ruby_prolog.rb
 Manifest.txt
 Rakefile

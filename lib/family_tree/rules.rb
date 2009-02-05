@@ -1,5 +1,5 @@
 # Basic family tree relationships..
-sibling[:X,:Y] <<= [ parent[:Z,:X], parent[:Z,:Y], noteq[:X,:Y] ]
+# sibling[:X,:Y] <<= [ parent[:Z,:X], parent[:Z,:Y], noteq[:X,:Y] ]
 mother[:X,:Y] <<= [parent[:X, :Y], female[:X]]
 father[:X,:Y] <<= [parent[:X, :Y], male[:X]]
 grandparent[:G,:C] <<= [ parent[:G,:P], parent[:P,:C]]
