@@ -1,4 +1,10 @@
+== 0.0.2 / 2009-02-04
+
+* Refactored the code into an object-oriented state.
+* Changed #query to not print results and return goals.
+* Made spec tests more meaningful.
+* Addressed small TODO items.
+
 == 0.0.1 / 2009-01-14
 
-* 1 major enhancement
-  * Birthday!
+* First release. Basically a glorified packaging of tiny_prolog and various extensions.

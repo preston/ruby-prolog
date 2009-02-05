@@ -4,16 +4,31 @@ require File.join(File.dirname(__FILE__), %w[spec_helper])
 
 describe RubyProlog do
 
+  
   # before :each do
   # end
   
+  
   it 'should not pollute the global namespace with predicates.' do
+    
+    # We'll create numerous instances of the engine and assert they do not interfere with each other.
      one = RubyProlog::Core.new
      one.instance_eval do
        male[:preston].fact
        query(male[:X])
      end
 
+     two = RubyProlog::Core.new
+     two.instance_eval do
+       male[:preston].fact
+       query(male[:X])
+     end
+     
+     three = RubyProlog::Core.new
+     three.instance_eval do
+       male[:preston].fact
+       query(male[:X])
+     end
 
   end
   

@@ -1,24 +1,31 @@
 ruby_prolog
     by Preston Lee
     http://openrain.com
-	I did not write the evaluative engine! This gem is a value-add of various code from the interwebs.
-	Unfortunately I cannot read Japanese and thus cannot give proper attribution. If *you* can, let me know!
+	The core engine is largely based on tiny_prolog, though numerous additional enhancements have been made
+	such as object-oriented refactorings and integration of ideas from the interwebs. Unfortunately I cannot
+	read Japanese and cannot give proper attribution to the original tiny_prolog author. If *you* can, let
+	me know and I'll update this document!
 
 == DESCRIPTION:
 
-	A pure Ruby gem implementation of a Prolog-like DSL for AI and logical programming.
+	An object-oriented pure Ruby implementation of a Prolog-like DSL for easy AI and logical programming.
 
 == FEATURES/PROBLEMS:
 
-* FIXME (list of features or problems)
+* Pure Ruby.
+* Tested with Ruby 1.8.7 (MRI). 
+* Object-oriented.
+* Multiple Prolog environments can be created and manipulated simultaneously.
+* Concurrent access to different core instances should be safe.
+* Concurrent access to a single core instance might probably explode in odd ways.
 
 == SYNOPSIS:
 
-  FIXME (code sample of usage)
+  See ruby_prolog_spec.rb for usage examples.
 
 == REQUIREMENTS:
 
-* FIXME (list of requirements)
+* Should work under all popular Ruby interpreters. Please report compatibility problems.
 
 == INSTALL:
 
@@ -28,7 +35,7 @@ ruby_prolog
 
 (The MIT License)
 
-Copyright (c) 2008 FIXME (different license?)
+Copyright (c) 2008 OpenRain, LLC
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
