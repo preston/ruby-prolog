@@ -1,4 +1,5 @@
 examples/acls.rb
+examples/hanoi.rb
 History.txt
 lib/ruby-prolog/ruby-prolog.rb
 lib/ruby-prolog.rb

@@ -138,8 +138,8 @@ module RubyProlog
 
   class CallbackEnvironment
   
-    def initialize(env, trail)
-      @env, @trail = env, trail
+    def initialize(env, trail, core)
+      @env, @trail, @core = env, trail, core
     end
   
     def [](t)
@@ -147,7 +147,8 @@ module RubyProlog
     end
   
     def unify(t, u)
-      return _unify(t, @env, u, @env, @trail, @env)
+      # pp "CORE " + @core
+      return @core._unify(t, @env, u, @env, @trail, @env)
     end
   
   end
@@ -233,7 +234,7 @@ module RubyProlog
             trail = []
             if _unify_(goal, env, d_head, d_env, trail, d_env)
               if Proc === d_body
-                if d_body[CallbackEnvironment.new(d_env, trail)]
+                if d_body[CallbackEnvironment.new(d_env, trail, self)]
                   _resolve_body(rest, env, cut) {
                     yield
                   }
