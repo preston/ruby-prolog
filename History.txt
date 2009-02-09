@@ -1,5 +1,7 @@
-== 0.0.3 / 2009-02-??
+== 0.0.3 / 2009-02-09
 
+* Renaming files due to RubyForge stupidity.
+* Adding usage examples.
 
 == 0.0.2 / 2009-02-04
 

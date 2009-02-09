@@ -6,4 +6,5 @@ Echoe.new("ruby-prolog") do |p|
     # p.docs_host = "uncapitalizer.com:~/www/files/doc/"
     # p.runtime_dependencies = ["string_tools >=1.4.0"]
     p.version = '0.0.3'
+    p.email = "preston.lee@openrain.com"
 end

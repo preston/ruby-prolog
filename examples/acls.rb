@@ -2,6 +2,76 @@ require 'rubygems'
 require 'ruby-prolog'
 
 c = RubyProlog::Core.new
-c.instance_eval {
+c.instance_eval do
+
+  # Let's put together an issue tracking system for Microsoft.
   
-}
+  # We'll start by declaring a few projects...
+  project_status['me', 'live'].fact
+  project_status['xp', 'live'].fact
+  project_status['vista', 'live'].fact
+  project_status['7', 'in_progress'].fact
+  
+  
+  # Now we'll create a custom ACL system...
+  role_can['user', 'create'].fact
+  role_can['user', 'read'].fact
+
+  role_can['qa', 'create'].fact
+  role_can['qa', 'read'].fact
+  role_can['qa', 'update'].fact
+
+  role_can['admin', 'create'].fact
+  role_can['admin', 'read'].fact
+  role_can['admin', 'update'].fact
+  role_can['admin', 'delete'].fact
+  
+  
+  # Let's put people on different projects
+  assigned['alice', 'me', 'user'].fact
+  assigned['bob', 'me', 'qa'].fact
+  assigned['charlie', 'me', 'qa'].fact
+  
+  assigned['alice', 'xp', 'user'].fact
+  assigned['bob', 'xp', 'user'].fact
+  assigned['charlie', 'xp', 'admin'].fact
+
+  assigned['alice', 'vista', 'qa'].fact
+  assigned['bob', 'vista', 'admin'].fact
+  assigned['charlie', 'vista', 'admin'].fact
+
+  assigned['alice', '7', 'user'].fact
+  assigned['bob', '7', 'qa'].fact
+  assigned['charlie', '7', 'qa'].fact
+  assigned['dale', '7', 'admin'].fact
+  
+  
+  # can_read_on_project[:U, :P] <<= [assigned[:U, :P, :R], role_can[:R, 'read']]
+  can_on_project[:U, :X, :P] <<= [assigned[:U, :P, :R], role_can[:R, :X]]
+  is_role_on_multiple_projects[:U, :R] <<= [assigned[:U, :X, :R], assigned[:U, :Y, :R], noteq[:X, :Y]]
+  # , noteq[:P1, :P2]
+  
+  puts 'Who does QA?'
+  p query(assigned[:U, :P, 'qa'])
+    
+  puts "Who can access the 'vista' project?"
+  p query(can_on_project[:U, 'read', 'vista'])
+  
+  puts "Does Alice have delete privileges on Vista?"
+  puts query(can_on_project['alice', 'delete', 'vista']).empty? ? "Yes" : "No"
+
+  puts "Does Bob have delete privileges on Vista?"
+  puts query(can_on_project['bob', 'delete', 'vista']).empty? ? "Yes" : "No"
+  
+  puts "Who is an admin on multiple projects?"
+  # p query(is_role_on_multiple_projects[:U, 'admin'])
+  
+  s = Array.new
+  query(is_role_on_multiple_projects[:U, 'admin']).each do |r|
+    s |= [r[0].args[0]] # Put each result into the array, if not already present.
+  end
+  s.each do |n| puts n end # Print all unique results!
+  
+  
+
+end
