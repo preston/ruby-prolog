@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'spec'
-require File.expand_path(File.join(File.dirname(__FILE__), %w[.. lib ruby_prolog]))
+require File.expand_path(File.join(File.dirname(__FILE__), %w[.. lib ruby-prolog]))
 
 Spec::Runner.configure do |config|
   # == Mock Framework

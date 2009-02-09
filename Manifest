@@ -1,9 +1,9 @@
 History.txt
-lib/ruby_prolog/ruby_prolog.rb
-lib/ruby_prolog.rb
+lib/ruby-prolog/ruby-prolog.rb
+lib/ruby-prolog.rb
 Manifest
 Rakefile
 README.txt
-spec/ruby_prolog_spec.rb
+spec/ruby-prolog_spec.rb
 spec/spec_helper.rb
 
