@@ -1,3 +1,5 @@
+# Copyright 2009, OpenRain, LLC. All rights reserved.
+# http://www.openrain.com.
 
 module RubyProlog
 

@@ -48,7 +48,10 @@ c.instance_eval do
   
   # can_read_on_project[:U, :P] <<= [assigned[:U, :P, :R], role_can[:R, 'read']]
   can_on_project[:U, :X, :P] <<= [assigned[:U, :P, :R], role_can[:R, :X]]
-  is_role_on_multiple_projects[:U, :R] <<= [assigned[:U, :X, :R], assigned[:U, :Y, :R], noteq[:X, :Y]]
+  is_role_on_multiple_projects[:U, :R] <<= [
+    assigned[:U, :X, :R],
+    assigned[:U, :Y, :R],
+    noteq[:X, :Y]]
   # , noteq[:P1, :P2]
   
   puts 'Who does QA?'
