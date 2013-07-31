@@ -1,14 +1,27 @@
 ruby_prolog
 ====
 
+An object-oriented pure Ruby implementation of a Prolog-like DSL for easy AI and logical programming. It should work under all popular Ruby interpreters. Please report compatibility problems.
+
 The core engine is largely based on tiny_prolog, though numerous additional enhancements have been made
 such as object-oriented refactorings and integration of ideas from the interwebs. Unfortunately I cannot
-read Japanese and cannot give proper attribution to the original tiny_prolog author. If *you* can, let
-me know and I'll update this document!
+read Japanese and cannot give proper attribution to the original tiny_prolog author. (If *you* can, let
+me know and I'll update this document!)
 
-Description
+
+Usage
 ----
-An object-oriented pure Ruby implementation of a Prolog-like DSL for easy AI and logical programming. It should work under all popular Ruby interpreters. Please report compatibility problems.
+
+Two runnable examples are included in the 'bin' directory. The first..
+
+    ruby-prolog-hanoi
+
+..is a ruby-prolog solution to the well-known "Towers of Hanoi" problem in computer science. The second..
+
+    ruby-prolog-acls
+
+..shows the ruby-prolog DSL can be trivially used to implement an access control system. If you have some other useful or clever examples, please contribute them!
+
 
 Features
 ----
