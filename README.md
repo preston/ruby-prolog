@@ -16,19 +16,20 @@ Usage
 
 Two runnable examples are included in the 'bin' directory. The first..
 
-    ruby-prolog-hanoi
-
-..is a ruby-prolog solution to the well-known "Towers of Hanoi" problem in computer science. The second..
-
     ruby-prolog-acls
 
-..shows the ruby-prolog DSL can be trivially used to implement an access control system. If you have some other useful or clever examples, please contribute them! See the test/ directory for additional examples. 
+..shows the ruby-prolog dynamic DSL used to trivially implement access control checks. The second..
 
+
+    ruby-prolog-hanoi
+
+..is a ruby-prolog solution to the well-known "Towers of Hanoi" problem in computer science. It's not clear, but something Prolog hackers will be interested in. If you have other useful or clever examples, please send a pull request! See the test/ directory for additional examples.
 
 Features
 ----
 
 * Pure Ruby.
+* No wacko dependencies.
 * Tested with Ruby 2.0.0! 
 * Object-oriented.
 * Multiple Prolog environments can be created and manipulated simultaneously.
@@ -36,17 +37,8 @@ Features
 * Concurrent access to a single core instance might probably explode in odd ways.
 
 
-Installation
-----
-
-
-
-
-
 
 License
 ----
 
-Released under the Apache 2 license.
-
-Copyright (c) 2013 Preston Lee. All rights reserved. http://prestonlee.com
+Released under the Apache 2 license. Copyright (c) 2013 Preston Lee. All rights reserved. http://prestonlee.com
