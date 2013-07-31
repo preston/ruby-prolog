@@ -1,7 +1,7 @@
 ruby-prolog
 ====
 
-ruby-prolog allows you to solve complex logic problems on the fly using a dynamic, Prolog-like DSL. Basic use is encompassed by stating basic facts using your data, defining rules, and then asking questions. Why is this cool? Because ruby-prolog allows you to leave your normal object-oriented vortex on demand and step into the alternate reality of declarative languages.
+ruby-prolog allows you to solve complex logic problems on the fly using a dynamic, Prolog-like DSL inline with your normal Ruby code. Basic use is encompassed by stating basic facts using your data, defining rules, and then asking questions. Why is this cool? Because ruby-prolog allows you to leave your normal object-oriented vortex on demand and step into the alternate reality of declarative languages.
 
 With ruby-prolog:
 
