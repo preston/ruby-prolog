@@ -1,5 +1,5 @@
 # Based on tiny_prolog h18.9/8
-
+# Fuglied by Preston Lee.
 module RubyProlog
 
   
@@ -39,7 +39,7 @@ module RubyProlog
       @pred, @args = pred, args
     end
 
-    def si(*rhs)                  # ラテン語の「もしも」
+    def si(*rhs)
       @pred.defs << [self, list(*rhs)]
     end
 
@@ -67,7 +67,7 @@ module RubyProlog
   end
 
 
-  # Lisp のリスト風の二項組
+  # Lisp
   class Cons < Array
 
     def initialize(car, cdr)
@@ -89,7 +89,6 @@ module RubyProlog
   end
 
 
-
   class Environment
 
     def initialize

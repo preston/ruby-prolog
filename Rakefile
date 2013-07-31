@@ -1,10 +1,12 @@
-require 'echoe'  
-Echoe.new("ruby-prolog") do |p|
-    p.author = "Preston Lee"
-    p.summary = "A Prolog-ish Ruby DSL."
-    p.url = "http://www.openrain.com.com"
-    # p.docs_host = "uncapitalizer.com:~/www/files/doc/"
-    # p.runtime_dependencies = ["string_tools >=1.4.0"]
-    p.version = '0.0.5'
-    p.email = "preston.lee@openrain.com"
+#!/usr/bin/env rake
+require "bundler/gem_tasks"
+ 
+require 'rake/testtask'
+ 
+Rake::TestTask.new do |t|
+  t.libs << 'lib/ruby-prolog'
+  t.test_files = FileList['test/lib/ruby-prolog/*_test.rb']
+  t.verbose = true
 end
+ 
+task :default => :test

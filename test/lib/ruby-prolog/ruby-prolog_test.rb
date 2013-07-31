@@ -1,35 +1,31 @@
 
-require File.join(File.dirname(__FILE__), %w[spec_helper])
+require_relative '../../test_helper'
 
 
-describe RubyProlog do
 
-  
-  # before :each do
-  # end
-  
+describe RubyProlog do  
   
   it 'should not pollute the global namespace with predicates.' do
     
     # We'll create numerous instances of the engine and assert they do not interfere with each other.
      one = RubyProlog::Core.new
      one.instance_eval do
-       query(male[:X]).length.should == 0
+       query(male[:X]).length.must_equal 0
      end
 
      two = RubyProlog::Core.new
      two.instance_eval do
        male[:preston].fact
-       query(male[:X]).length.should == 1
+       query(male[:X]).length.must_equal 1
      end
      
      three = RubyProlog::Core.new
      three.instance_eval do
-       query(male[:X]).length.should == 0
+       query(male[:X]).length.must_equal 0
      end
      
      one.instance_eval do
-       query(male[:X]).length.should == 0
+       query(male[:X]).length.must_equal 0
      end
 
   end
@@ -118,34 +114,34 @@ describe RubyProlog do
       # p "Who are Silas's parents?"
       # Silas should have two parents: Matt and Julie.
       r = query(parent[:P, 'Silas'])
-      r.length.should == 2
-      r[0][0].args[0].should == 'Matt'
-      r[1][0].args[0].should == 'Julie'
+      r.length.must_equal 2
+      r[0][0].args[0].must_equal 'Matt'
+      r[1][0].args[0].must_equal 'Julie'
       
       # p "Who is married?"
       # We defined 5 married facts.
-      query(married[:A, :B]).length.should == 5
+      query(married[:A, :B]).length.must_equal 5
         
       # p 'Are Karen and Julie siblings?'
       # Yes, through two parents.
-      query(sibling['Karen', 'Julie']).length.should == 2
+      query(sibling['Karen', 'Julie']).length.must_equal 2
       
       
       # p "Who likes to play games?"
       # Four people.
-      query(interest[:X, 'Games']).length.should == 4
+      query(interest[:X, 'Games']).length.must_equal 4
       
       
       # p "Who likes to play checkers?"
       # Nobody.
-      query(interest[:X, 'Checkers']).length.should == 0
+      query(interest[:X, 'Checkers']).length.must_equal 0
 
       # p "Who are Karen's ancestors?"
       # query(ancestor[:A, 'Karen'])
 
       # p "What grandparents are also widowers?"
       # Marge, twice, because of two grandchildren.
-      query(widower[:X], grandparent[:X, :G]).length.should == 2
+      query(widower[:X], grandparent[:X, :G]).length.must_equal 2
     end
 
   end
@@ -209,14 +205,11 @@ describe RubyProlog do
       ]
 
        hanoi[:N] <<=  move[:N,"left","right","center"]
-       query(hanoi[5]).length.should == 1
+       query(hanoi[5]).length.must_equal 1
 
        # do_stuff[:STUFF].calls{|env| print env[:STUFF]; true}
 
     end  
     
   end
-  
-  
-
 end
