@@ -1,4 +1,4 @@
-ruby_prolog
+ruby-prolog
 ====
 
 An object-oriented pure Ruby implementation of a Prolog-like DSL for easy AI and logical programming. It should work under all popular Ruby interpreters. Please report compatibility problems.
@@ -12,6 +12,8 @@ me know and I'll update this document!)
 Usage
 ----
 
+    gem install ruby-prolog
+
 Two runnable examples are included in the 'bin' directory. The first..
 
     ruby-prolog-hanoi
@@ -20,7 +22,7 @@ Two runnable examples are included in the 'bin' directory. The first..
 
     ruby-prolog-acls
 
-..shows the ruby-prolog DSL can be trivially used to implement an access control system. If you have some other useful or clever examples, please contribute them!
+..shows the ruby-prolog DSL can be trivially used to implement an access control system. If you have some other useful or clever examples, please contribute them! See the test/ directory for additional examples. 
 
 
 Features
@@ -37,9 +39,9 @@ Features
 Installation
 ----
 
-    gem install ruby_prolog
 
-See ruby_prolog_spec.rb for usage examples. 
+
+
 
 
 License
