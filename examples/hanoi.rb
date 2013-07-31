@@ -1,11 +1,12 @@
-require 'rubygems'
-require 'ruby-prolog'
+#!/usr/bin/env ruby
 
-# require File.join(File.dirname(__FILE__), %w[.. lib ruby-prolog])
+require 'ruby-prolog'
 
 # Inspired by..
 # http://www.csupomona.edu/~jrfisher/www/prolog_tutorial/2_3.html
 # http://eigenclass.org/hiki.rb?tiny+prolog+in+ruby
+
+# Adapted by Preston Lee.
 
 c = RubyProlog::Core.new
 c.instance_eval do

@@ -1,4 +1,8 @@
-require 'rubygems'
+#!/usr/bin/env ruby
+#
+# By Preston Lee
+#
+
 require 'ruby-prolog'
 
 c = RubyProlog::Core.new
