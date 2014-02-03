@@ -20,8 +20,6 @@ module RubyProlog
       return Goal.new(self, args)
     end
 
-    def []=(*a); end
-   
   end
 
 

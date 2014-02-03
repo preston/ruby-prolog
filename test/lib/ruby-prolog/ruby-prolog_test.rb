@@ -37,17 +37,17 @@ describe RubyProlog do
     c = RubyProlog::Core.new
     c.instance_eval do
       # Basic family tree relationships..
-      sibling[:X,:Y] <<= [ parent[:Z,:X], parent[:Z,:Y], noteq[:X,:Y] ]
-      mother[:X,:Y] <<= [parent[:X, :Y], female[:X]]
-      father[:X,:Y] <<= [parent[:X, :Y], male[:X]]
-      grandparent[:G,:C] <<= [ parent[:G,:P], parent[:P,:C]]
-      ancestor[:A, :C] <<= [parent[:A, :X], parent[:X, :B]]
-      mothers[:M, :C] <<= mother[:M, :C]
-      mothers[:M, :C] <<= [mother[:M, :X], mothers[:X, :C]]
-      fathers[:F, :C] <<= father[:F, :C]
-      fathers[:F, :C] <<= [father[:F, :X], fathers[:X, :C]]
-      widower[:W] <<= [married[:W, :X], deceased[:X], nl[deceased[:W]]]
-      widower[:W] <<= [married[:X, :W], deceased[:X], nl[deceased[:W]]]
+      sibling[:X,:Y] << [ parent[:Z,:X], parent[:Z,:Y], noteq[:X,:Y] ]
+      mother[:X,:Y] << [parent[:X, :Y], female[:X]]
+      father[:X,:Y] << [parent[:X, :Y], male[:X]]
+      grandparent[:G,:C] << [ parent[:G,:P], parent[:P,:C]]
+      ancestor[:A, :C] << [parent[:A, :X], parent[:X, :B]]
+      mothers[:M, :C] << mother[:M, :C]
+      mothers[:M, :C] << [mother[:M, :X], mothers[:X, :C]]
+      fathers[:F, :C] << father[:F, :C]
+      fathers[:F, :C] << [father[:F, :X], fathers[:X, :C]]
+      widower[:W] << [married[:W, :X], deceased[:X], nl[deceased[:W]]]
+      widower[:W] << [married[:X, :W], deceased[:X], nl[deceased[:W]]]
 
       # Basic parents relationships as could be stored in a typical relational database.
       parent['Ms. Old', 'Marge'].fact
@@ -174,10 +174,10 @@ describe RubyProlog do
       kind['monitor']
       kind['phone']
       
-      model[:M] <<= [manfactures[:V, :M]]
+      model[:M] << [manfactures[:V, :M]]
       
-      vendor_of[:V, :K] <<= [vendor[:V], manufactures[:V, :M], is_a[:M, :K]]
-      # not_vendor_of[:V, :K] <<= [vendor[:V], nl[vendor_of[:V, :K]]]
+      vendor_of[:V, :K] << [vendor[:V], manufactures[:V, :M], is_a[:M, :K]]
+      # not_vendor_of[:V, :K] << [vendor[:V], nl[vendor_of[:V, :K]]]
 
       query(is_a[:K, 'laptop']).length == 2
       query(vendor_of[:V, 'phone']) == 1
@@ -191,20 +191,20 @@ describe RubyProlog do
     c = RubyProlog::Core.new
     c.instance_eval do
 
-      move[0,:X,:Y,:Z] <<= :CUT   # There are no more moves left
-      move[:N,:A,:B,:C] <<= [
+      move[0,:X,:Y,:Z] << :CUT   # There are no more moves left
+      move[:N,:A,:B,:C] << [
         is(:M,:N){|n| n - 1}, # reads as "M IS N - 1"
         move[:M,:A,:C,:B],
         # write_info[:A,:B],
         move[:M,:C,:B,:A]
       ]
-      write_info[:X,:Y] <<= [
+      write_info[:X,:Y] << [
         # write["move a disc from the "],
         # write[:X], write[" pole to the "],
         # write[:Y], writenl[" pole "]
       ]
 
-       hanoi[:N] <<=  move[:N,"left","right","center"]
+       hanoi[:N] <<  move[:N,"left","right","center"]
        query(hanoi[5]).length.must_equal 1
 
        # do_stuff[:STUFF].calls{|env| print env[:STUFF]; true}
