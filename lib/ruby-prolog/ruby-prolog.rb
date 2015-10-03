@@ -300,36 +300,9 @@ module RubyProlog
     def method_missing(meth, *args)
         # puts "NEW PRED #{meth} #{meth.class}"
         pred = Predicate.new(meth)
-        # proc = Proc.new {pred}
-
 
         # We only want to define the method on this specific object instance to avoid polluting global namespaces.
-        
-        # You can't do this..
-        # class << self
-        #           module_eval do
-        #             send(:define_method, m, proc)
-        #           end
-        #         end
-        
-        # Nor this..
-        # define_method(meth) {pred}
-
-        # Nor this..
-        # self.send(:define_method, meth, proc)
-        
-        # And you don't want to pollute the global namespace like this...
-        # Object.class_eval{ define_method(meth){pr} }
-        
-        
-        # Sooooo... I know this doesn't really make intuitive sense,
-        # but you need to get the eigenclass and then define
-        # the method within that context in such a way that we
-        # have access to local variables, like this...
-        class << self; self; end.module_eval do
-          define_method meth, Proc.new{pred}
-        end
-        # ...which is major fuglytown, but I don't know how to do it any other way.
+        define_singleton_method(meth){ pred }
 
         return pred
     end
