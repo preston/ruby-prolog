@@ -2,10 +2,10 @@
 # Fuglied by Preston Lee.
 module RubyProlog
 
-  
+
   class Predicate
-  
-    attr_reader :defs
+
+    attr_reader :defs, :name
 
     def initialize(name)
       @name = name
@@ -20,6 +20,11 @@ module RubyProlog
       return Goal.new(self, args)
     end
 
+    def to_prolog
+      @defs.map do |goal, body|
+        "#{goal.to_prolog}#{body ? " :- #{body.to_prolog}" : ''}."
+      end.join("\n")
+    end
   end
 
 
@@ -32,7 +37,7 @@ module RubyProlog
       x.reverse_each {|e| y = Cons.new(e, y)}
       return y
     end
-    
+
     def initialize(pred, args)
       @pred, @args = pred, args
     end
@@ -62,6 +67,25 @@ module RubyProlog
       return @pred.inspect.to_s + @args.inspect.to_s
     end
 
+    def to_prolog
+      args_out = @args.map do |arg|
+        case arg
+        when Symbol
+          if /[[:upper:]]/.match(arg.to_s[0])
+            arg.to_s
+          else
+            "_#{arg.to_s}"
+          end
+        when String
+          "'#{arg}'"
+        when Cons, Goal
+          arg.to_prolog
+        else
+          raise "Unknown argument: #{arg.inspect}"
+        end
+      end.join(', ')
+      "#{@pred.name}(#{args_out})"
+    end
   end
 
 
@@ -84,6 +108,15 @@ module RubyProlog
       return '(' + repr[self].join(' ') + ')'
     end
 
+    def to_prolog
+      current = self
+      array = []
+      while current
+        array << current[0].to_prolog
+        current = current[1]
+      end
+      return array.join(', ')
+    end
   end
 
 
@@ -109,6 +142,24 @@ module RubyProlog
       @table.clear
     end
 
+    def solution
+      @table.map do |var, env|
+        xp = env
+        loop {
+          x, x_env = xp
+          y, y_env = x_env.dereference(x)
+          next_xp = y_env.get(x)
+          if next_xp.nil?
+            xp = [y, y_env]
+            break
+          else
+            xp = next_xp
+          end
+        }
+        [var, xp[0]]
+      end.to_h
+    end
+
     def dereference(t)
       env = self
       while Symbol === t
@@ -128,26 +179,26 @@ module RubyProlog
              else t
              end
     end
-    
-    
+
+
   end
 
 
   class CallbackEnvironment
-  
+
     def initialize(env, trail, core)
       @env, @trail, @core = env, trail, core
     end
-  
+
     def [](t)
       return @env[t]
     end
-  
+
     def unify(t, u)
       # pp "CORE " + @core
       return @core._unify(t, @env, u, @env, @trail, @env)
     end
-  
+
   end
 
 
@@ -180,7 +231,7 @@ module RubyProlog
         return false unless x.pred == y.pred
         x, y = x.args, y.args
       end
-  
+
       if Array === x and Array === y
         return false unless x.length == y.length
         for i in 0 ... x.length     # x.each_index do |i| も可
@@ -199,8 +250,8 @@ module RubyProlog
       x.reverse_each {|e| y = Cons.new(e, y)}
       return y
     end
-    
-    
+
+
     def resolve(*goals)
       env = Environment.new
       _resolve_body(list(*goals), env, [false]) {
@@ -269,23 +320,20 @@ module RubyProlog
     end
 
 
-    def query(*goals)
-      count = 0
-      results = Array.new
-      # printout = proc {|x|
-      #   x = x[0] if x.length == 1
-      #   printf "%d %s\n", count, x.inspect
-      # }
+    def query(&block)
+      goals = instance_eval(&block)
+      goals = [goals] unless goals.is_a?(Array)
+      results = []
+
       resolve(*goals) {|env|
-        count += 1
-        results << env[goals]
-        # printout[env[goals]]
+        puts "Found solution: #{env[goals]}" if $trace
+        # puts env.instance_variable_get :@table
+        results << env.solution
       }
-      # printout[goals] if count == 0
       return results
     end
-  
-  
+
+
     def is(*syms,&block)
       $is_cnt ||= 0
       is = Predicate.new "IS_#{$is_cnt += 1}"
@@ -298,46 +346,24 @@ module RubyProlog
     end
 
     def method_missing(meth, *args)
-        # puts "NEW PRED #{meth} #{meth.class}"
-        pred = Predicate.new(meth)
-        # proc = Proc.new {pred}
+      pred = Predicate.new(meth)
 
+      # We only want to define the method on this specific object instance to avoid polluting global namespaces.
+      define_singleton_method(meth){ pred }
 
-        # We only want to define the method on this specific object instance to avoid polluting global namespaces.
-        
-        # You can't do this..
-        # class << self
-        #           module_eval do
-        #             send(:define_method, m, proc)
-        #           end
-        #         end
-        
-        # Nor this..
-        # define_method(meth) {pred}
+      @listing << pred unless @listing.nil?
 
-        # Nor this..
-        # self.send(:define_method, meth, proc)
-        
-        # And you don't want to pollute the global namespace like this...
-        # Object.class_eval{ define_method(meth){pr} }
-        
-        
-        # Sooooo... I know this doesn't really make intuitive sense,
-        # but you need to get the eigenclass and then define
-        # the method within that context in such a way that we
-        # have access to local variables, like this...
-        class << self; self; end.module_eval do
-          define_method meth, Proc.new{pred}
-        end
-        # ...which is major fuglytown, but I don't know how to do it any other way.
-
-        return pred
+      return pred
     end
 
-  
+    def to_prolog
+      @listing.map{|pred| pred.to_prolog}
+    end
+
+
     def initialize
-      # We do not need to predefine predicates like this because they will automatically be defined for us.
-      # write = Predicate.new "write"
+      @listing = nil
+      # These predicates are made available in all environments
       write[:X].calls{|env| print env[:X]; true}
       writenl[:X].calls{|env| puts env[:X]; true}
       nl[:X].calls{|e| puts; true}
@@ -356,6 +382,15 @@ module RubyProlog
         end
       end
       numeric[:X].calls{|env| Numeric === env[:X] }
+
+      not_[:X].calls do |env|
+        found_solution = false
+        resolve(env[:X], :CUT) { found_solution = true }
+        found_solution == false
+      end
+
+      # Define this at the end so the above predicates don't make it in
+      @listing = []
     end
 
   end
