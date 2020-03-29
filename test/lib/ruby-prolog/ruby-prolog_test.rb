@@ -3,35 +3,41 @@ require_relative '../../test_helper'
 
 
 
-describe RubyProlog do  
-  
+describe RubyProlog do
+
   it 'should not pollute the global namespace with predicates.' do
-    
+
     # We'll create numerous instances of the engine and assert they do not interfere with each other.
-     one = RubyProlog::Core.new
-     one.instance_eval do
-       query(male[:X]).length.must_equal 0
-     end
+    one = RubyProlog::Core.new
+    _( one.query{ male[:X] }.length ).must_equal 0
 
-     two = RubyProlog::Core.new
-     two.instance_eval do
-       male[:preston].fact
-       query(male[:X]).length.must_equal 1
-     end
-     
-     three = RubyProlog::Core.new
-     three.instance_eval do
-       query(male[:X]).length.must_equal 0
-     end
-     
-     one.instance_eval do
-       query(male[:X]).length.must_equal 0
-     end
+    two = RubyProlog::Core.new
+    two.instance_eval do
+      male[:preston].fact
+    end
+    _( two.query{ male[:X] }.length ).must_equal 1
 
+    three = RubyProlog::Core.new
+    _( three.query{ male[:X] }.length ).must_equal 0
+
+    _( one.query{ male[:X] }.length ).must_equal 0
   end
-  
 
 
+  it 'returns hashes of solutions' do
+    one = RubyProlog::Core.new
+    one.instance_eval do
+      foo['a', 'b'].fact
+      foo['a', 'b'].fact
+      foo['a', 'c'].fact
+      foo['d', 'e'].fact
+      foo['d', 'c'].fact
+    end
+    _( one.query {_= foo['a', :X] } ).must_equal [{ X: 'b' }, { X: 'b' }, { X: 'c' }]
+    _( one.query {_= foo['a', :X], foo['d', :X] } ).must_equal [{ X: 'c' }]
+  end
+
+  focus
   it 'should be able to query simple family trees.' do
 
     c = RubyProlog::Core.new
@@ -40,12 +46,18 @@ describe RubyProlog do
       sibling[:X,:Y] << [ parent[:Z,:X], parent[:Z,:Y], noteq[:X,:Y] ]
       mother[:X,:Y] << [parent[:X, :Y], female[:X]]
       father[:X,:Y] << [parent[:X, :Y], male[:X]]
+
       grandparent[:G,:C] << [ parent[:G,:P], parent[:P,:C]]
-      ancestor[:A, :C] << [parent[:A, :X], parent[:X, :B]]
+
+      ancestor[:A, :C] << [parent[:A, :C]]
+      ancestor[:A, :C] << [parent[:A, :X], parent[:X, :C]]
+
       mothers[:M, :C] << mother[:M, :C]
       mothers[:M, :C] << [mother[:M, :X], mothers[:X, :C]]
+
       fathers[:F, :C] << father[:F, :C]
       fathers[:F, :C] << [father[:F, :X], fathers[:X, :C]]
+
       widower[:W] << [married[:W, :X], deceased[:X], nl[deceased[:W]]]
       widower[:W] << [married[:X, :W], deceased[:X], nl[deceased[:W]]]
 
@@ -108,42 +120,45 @@ describe RubyProlog do
       interest['Karen', 'Walks'].fact
       interest['Ron', 'Walks'].fact
       interest['Marcia', 'Walks'].fact
-      
-      # Runs some queries..
-      
-      # p "Who are Silas's parents?"
-      # Silas should have two parents: Matt and Julie.
-      r = query(parent[:P, 'Silas'])
-      r.length.must_equal 2
-      r[0][0].args[0].must_equal 'Matt'
-      r[1][0].args[0].must_equal 'Julie'
-      
-      # p "Who is married?"
-      # We defined 5 married facts.
-      query(married[:A, :B]).length.must_equal 5
-        
-      # p 'Are Karen and Julie siblings?'
-      # Yes, through two parents.
-      query(sibling['Karen', 'Julie']).length.must_equal 2
-      
-      
-      # p "Who likes to play games?"
-      # Four people.
-      query(interest[:X, 'Games']).length.must_equal 4
-      
-      
-      # p "Who likes to play checkers?"
-      # Nobody.
-      query(interest[:X, 'Checkers']).length.must_equal 0
-
-      # p "Who are Karen's ancestors?"
-      # query(ancestor[:A, 'Karen'])
-
-      # p "What grandparents are also widowers?"
-      # Marge, twice, because of two grandchildren.
-      query(widower[:X], grandparent[:X, :G]).length.must_equal 2
     end
 
+    # Runs some queries..
+
+    # p "Who are Silas's parents?"
+    # Silas should have two parents: Matt and Julie.
+    _( c.query{ parent[:P, 'Silas'] } ).must_equal [{P: 'Matt'}, {P: 'Julie'}]
+
+    # p "Who is married?"
+    # We defined 5 married facts.
+    _( c.query{ married[:A, :B] }.length ).must_equal 5
+
+    # p 'Are Karen and Julie siblings?'
+    # Yes, through two parents.
+    _( c.query{ sibling['Karen', 'Julie'] }.length ).must_equal 2
+
+
+    # p "Who likes to play games?"
+    # Four people.
+    _( c.query{ interest[:X, 'Games'] }.length ).must_equal 4
+
+
+    # p "Who likes to play checkers?"
+    # Nobody.
+    _( c.query{ interest[:X, 'Checkers'] }.length ).must_equal 0
+
+    # p "Who are Karen's ancestors?"
+    _( c.query{ ancestor[:A, 'Karen'] } ).must_equal [
+      {A: 'Marcia'},
+      {A: 'Ron'},
+      {A: 'Carol'},
+      {A: 'Kent'},
+      {A: 'Marge'},
+      {A: 'Pappy'},
+    ]
+
+    # p "What grandparents are also widowers?"
+    # Marge, twice, because of two grandchildren.
+    _( c.query{_= widower[:X], grandparent[:X, :G] }.length ).must_equal 2
   end
 
 
@@ -154,39 +169,38 @@ describe RubyProlog do
 
       vendor['dell'].fact
       vendor['apple'].fact
-      
+
       model['ultrasharp'].fact
       model['xps'].fact
       model['macbook'].fact
       model['iphone'].fact
-      
+
       manufactures['dell', 'ultrasharp'].fact
       manufactures['dell', 'xps'].fact
       manufactures['apple', 'macbook'].fact
       manufactures['apple', 'iphone'].fact
-      
+
       is_a['xps', 'laptop'].fact
       is_a['macbook', 'laptop'].fact
       is_a['ultrasharp', 'monitor'].fact
       is_a['iphone', 'phone'].fact
-      
-      kind['laptop']
-      kind['monitor']
-      kind['phone']
-      
-      model[:M] << [manfactures[:V, :M]]
-      
-      vendor_of[:V, :K] << [vendor[:V], manufactures[:V, :M], is_a[:M, :K]]
-      # not_vendor_of[:V, :K] << [vendor[:V], nl[vendor_of[:V, :K]]]
 
-      query(is_a[:K, 'laptop']).length == 2
-      query(vendor_of[:V, 'phone']) == 1
-      # pp query(not_vendor_of[:V, 'phone'])
+      kind['laptop'].fact
+      kind['monitor'].fact
+      kind['phone'].fact
+
+      model[:M] << [manfactures[:V, :M]]
+
+      vendor_of[:V, :K] << [vendor[:V], manufactures[:V, :M], is_a[:M, :K]]
+      not_vendor_of[:V, :K] << [vendor[:V], not_[vendor_of[:V, :K]]]
     end
-    
+
+    _( c.query{ is_a[:K, 'laptop'] }.length ).must_equal 2
+    _( c.query{ vendor_of[:V, 'phone'] } ).must_equal [{V: 'apple'}]
+    _( c.query{ not_vendor_of[:V, 'phone'] } ).must_equal [{V: 'dell'}]
   end
-  
-  
+
+
   it 'should solve the Towers of Hanoi problem.' do
     c = RubyProlog::Core.new
     c.instance_eval do
@@ -205,11 +219,9 @@ describe RubyProlog do
       ]
 
        hanoi[:N] <<  move[:N,"left","right","center"]
-       query(hanoi[5]).length.must_equal 1
+    end
 
-       # do_stuff[:STUFF].calls{|env| print env[:STUFF]; true}
+    _( c.query{ hanoi[5] } ).must_equal [{}]
 
-    end  
-    
   end
 end
