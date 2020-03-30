@@ -35,9 +35,20 @@ describe RubyProlog do
     end
     _( one.query {_= foo['a', :X] } ).must_equal [{ X: 'b' }, { X: 'b' }, { X: 'c' }]
     _( one.query {_= foo['a', :X], foo['d', :X] } ).must_equal [{ X: 'c' }]
+    _(one.to_prolog.class).must_equal String
   end
 
-  focus
+  it 'works with numbers' do
+    one = RubyProlog::Core.new
+    one.instance_eval do
+      foo[10, 20].fact
+      foo[10, 30].fact
+    end
+    _( one.query {_= foo[10, :X] } ).must_equal [{ X: 20 }, { X: 30 }]
+
+    _(one.to_prolog.class).must_equal String
+  end
+
   it 'should be able to query simple family trees.' do
 
     c = RubyProlog::Core.new
@@ -159,6 +170,8 @@ describe RubyProlog do
     # p "What grandparents are also widowers?"
     # Marge, twice, because of two grandchildren.
     _( c.query{_= widower[:X], grandparent[:X, :G] }.length ).must_equal 2
+
+    _(c.to_prolog.class).must_equal String
   end
 
 
@@ -198,6 +211,7 @@ describe RubyProlog do
     _( c.query{ is_a[:K, 'laptop'] }.length ).must_equal 2
     _( c.query{ vendor_of[:V, 'phone'] } ).must_equal [{V: 'apple'}]
     _( c.query{ not_vendor_of[:V, 'phone'] } ).must_equal [{V: 'dell'}]
+    _(c.to_prolog.class).must_equal String
   end
 
 
@@ -223,5 +237,6 @@ describe RubyProlog do
 
     _( c.query{ hanoi[5] } ).must_equal [{}]
 
+    _(c.to_prolog.class).must_equal String
   end
 end

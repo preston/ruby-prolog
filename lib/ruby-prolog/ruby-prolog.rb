@@ -80,11 +80,18 @@ module RubyProlog
           "'#{arg}'"
         when Cons, Goal
           arg.to_prolog
+        when Numeric
+          arg.to_s
         else
           raise "Unknown argument: #{arg.inspect}"
         end
       end.join(', ')
-      "#{@pred.name}(#{args_out})"
+
+      if @pred.name == :not_
+        "\\+ #{args_out}"
+      else
+        "#{@pred.name}(#{args_out})"
+      end
     end
   end
 
@@ -112,7 +119,10 @@ module RubyProlog
       current = self
       array = []
       while current
-        array << current[0].to_prolog
+        array << case current[0]
+          when :CUT then '!'
+          else current[0].to_prolog
+          end
         current = current[1]
       end
       return array.join(', ')
@@ -357,7 +367,7 @@ module RubyProlog
     end
 
     def to_prolog
-      @listing.map{|pred| pred.to_prolog}
+      @listing.map{|pred| pred.to_prolog}.join('\n\n')
     end
 
 
