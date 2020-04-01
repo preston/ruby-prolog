@@ -277,4 +277,31 @@ describe RubyProlog do
 
     _(c.to_prolog.class).must_equal String
   end
+
+  it 'works on the other examples in the readme' do
+    db = RubyProlog.new do
+      implication['a', 'b'].fact
+      implication['b', 'c'].fact
+      implication['c', 'd'].fact
+      implication['c', 'x'].fact
+
+      implies[:A, :B] << implication[:A, :B]
+      implies[:A, :B] << [
+        implication[:A, :Something],
+        implies[:Something, :B]
+      ]
+    end
+
+    _( db.query{ implication['c', :X] } ).must_equal [{ X: 'd' }, { X: 'x' }]
+    _( db.query{ implication[:X, :_] } ).must_equal [{ X: 'a' }, { X: 'b' }, { X: 'c' }, { X: 'c' }]
+    _( db.query{_= implies['a', :X] } ).must_equal [{ X: 'b' }, { X: 'c' }, { X: 'd' }, { X: 'x' }]
+
+    _( db.query{[ implication['b', :S], implies[:S, :B] ]} ).must_equal [{:S=>"c", :B=>"d"}, {:S=>"c", :B=>"x"}]
+    _( db.query{_= implication['b', :S], implies[:S, :B] } ).must_equal [{:S=>"c", :B=>"d"}, {:S=>"c", :B=>"x"}]
+
+    # For good measure
+    _( db.query{_= implies['a', 'b'] } ).must_equal [{}]
+    _( db.query{_= implies['a', 'd'] } ).must_equal [{}]
+    _( db.query{_= implies['a', 'idontexist'] } ).must_equal []
+  end
 end
