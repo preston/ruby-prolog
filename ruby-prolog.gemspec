@@ -8,17 +8,18 @@ Gem::Specification.new do |spec|
   spec.version       = RubyProlog::VERSION
   spec.authors       = ["Preston Lee"]
   spec.email         = ["preston.lee@prestonlee.com"]
-  spec.description   = "A Prolog-ish Ruby DSL."
+  spec.description   = "A pure Ruby implementation of a useful subset of Prolog."
   spec.summary       = "A Prolog-ish Ruby DSL."
   spec.homepage      = "http://github.com/preston/ruby-prolog"
-  spec.license       = "Apache 2"
+  spec.license       = "Apache-2.0"
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "minitest"
+  spec.add_development_dependency "bundler", "~> 2"
+  spec.add_development_dependency "rake", "~> 13"
+  spec.add_development_dependency "minitest", "~> 5.14.0"
+  spec.add_development_dependency "minitest-focus", "~> 1.1.2"
 end
