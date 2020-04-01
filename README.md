@@ -23,6 +23,7 @@ Say you want to write the following Prolog code:
 implication(a, b).
 implication(b, c).
 implication(c, d).
+implication(c, x).
 
 implies(A, B) :- implication(A, B).
 implies(A, B) :- implication(A, Something), implies(Something, B).
