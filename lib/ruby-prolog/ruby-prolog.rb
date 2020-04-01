@@ -111,7 +111,9 @@ module RubyProlog
       args_out = @args.map do |arg|
         case arg
         when Symbol
-          if /[[:upper:]]/.match(arg.to_s[0])
+          if arg == :_
+            "_"
+          elsif /[[:upper:]]/.match(arg.to_s[0])
             arg.to_s
           else
             "_#{arg.to_s}"
@@ -161,6 +163,7 @@ module RubyProlog
       while current
         array << case current[0]
           when :CUT then '!'
+          when :_ then '_'
           else current[0].to_prolog
           end
         current = current[1]
@@ -304,7 +307,9 @@ module RubyProlog
     def _unify(x, x_env, y, y_env, trail, tmp_env)
 
       loop {
-        if Symbol === x
+        if x == :_
+          return true
+        elsif Symbol === x
           xp = x_env.get(x)
           if xp.nil?
             y, y_env = y_env.dereference(y)
@@ -446,7 +451,7 @@ module RubyProlog
     end
 
     def to_prolog
-      @db.listing.map(&:to_prolog).join('\n\n')
+      @db.listing.map(&:to_prolog).join("\n\n")
     end
 
 

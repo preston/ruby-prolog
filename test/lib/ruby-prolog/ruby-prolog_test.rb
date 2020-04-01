@@ -55,6 +55,20 @@ describe RubyProlog do
     _( one.query {_= foo[:X] } ).must_equal []
   end
 
+  it 'supports underscore' do
+    one = RubyProlog::Core.new
+    one.instance_eval do
+      foo[10, 200].fact
+      foo[10, 300].fact
+      foo[20, 400].fact
+
+      bar[50, :_].fact
+    end
+    _( one.query { foo[:X, :_] } ).must_equal [{X: 10}, {X: 10}, {X: 20}]
+    _( one.query { bar[50, 99] } ).must_equal [{}]
+    one.to_prolog
+  end
+
   it 'supports clone' do
     one = RubyProlog::Core.new
     one.instance_eval do
