@@ -2,6 +2,12 @@
 # Fuglied by Preston Lee.
 module RubyProlog
 
+  def self.new(&block)
+    c = Core.new
+    c.instance_eval(&block) if block_given?
+    c
+  end
+
   class Predicate
     @@id_counter = 0
 

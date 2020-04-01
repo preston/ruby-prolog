@@ -25,8 +25,7 @@ describe RubyProlog do
 
 
   it 'returns hashes of solutions' do
-    one = RubyProlog::Core.new
-    one.instance_eval do
+    one = RubyProlog.new do
       foo['a', 'b'].fact
       foo['a', 'b'].fact
       foo['a', 'c'].fact
@@ -39,8 +38,7 @@ describe RubyProlog do
   end
 
   it 'works with numbers' do
-    one = RubyProlog::Core.new
-    one.instance_eval do
+    one = RubyProlog.new do
       foo[10, 20].fact
       foo[10, 30].fact
     end
@@ -80,8 +78,7 @@ describe RubyProlog do
 
   it 'should be able to query simple family trees.' do
 
-    c = RubyProlog::Core.new
-    c.instance_eval do
+    c = RubyProlog.new do
       # Basic family tree relationships..
       sibling[:X,:Y] << [ parent[:Z,:X], parent[:Z,:Y], noteq[:X,:Y] ]
       mother[:X,:Y] << [parent[:X, :Y], female[:X]]
@@ -206,8 +203,7 @@ describe RubyProlog do
 
   it 'should be able to query simple family trees.' do
 
-    c = RubyProlog::Core.new
-    c.instance_eval do
+    c = RubyProlog.new do
 
       vendor['dell'].fact
       vendor['apple'].fact
@@ -245,8 +241,7 @@ describe RubyProlog do
 
 
   it 'should solve the Towers of Hanoi problem.' do
-    c = RubyProlog::Core.new
-    c.instance_eval do
+    c = RubyProlog.new do
 
       move[0,:X,:Y,:Z] << :CUT   # There are no more moves left
       move[:N,:A,:B,:C] << [
