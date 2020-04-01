@@ -2,14 +2,17 @@
 # Fuglied by Preston Lee.
 module RubyProlog
 
-
   class Predicate
+    @@id_counter = 0
 
-    attr_reader :defs, :name
+    attr_reader :id, :name
+    attr_accessor :db, :clauses
 
-    def initialize(name)
+    def initialize(db, name)
+      @id = (@@id_counter += 1)
+      @db = db
       @name = name
-      @defs = []
+      @clauses = []
     end
 
     def inspect
@@ -17,33 +20,36 @@ module RubyProlog
     end
 
     def [](*args)
-      return Goal.new(self, args)
+      return TempClause.new(@db, self, args)
     end
 
     def to_prolog
-      @defs.map do |goal, body|
-        "#{goal.to_prolog}#{body ? " :- #{body.to_prolog}" : ''}."
+      @clauses.map do |head, body|
+        "#{head.to_prolog}#{body ? " :- #{body.to_prolog}" : ''}."
       end.join("\n")
+    end
+
+    def fork(new_db)
+      dupe = self.clone
+      dupe.db = new_db
+      dupe.clauses = dupe.clauses.dup
+      dupe
     end
   end
 
-
-  class Goal
-
-    attr_reader :pred, :args
-
-    def list(*x)
-      y = nil
-      x.reverse_each {|e| y = Cons.new(e, y)}
-      return y
-    end
-
-    def initialize(pred, args)
-      @pred, @args = pred, args
+  class TempClause
+    def initialize(db, pred, args)
+      @db, @pred, @args = db, pred, args
     end
 
     def si(*rhs)
-      @pred.defs << [self, list(*rhs)]
+      goals = rhs.map do |x|
+        case x
+        when TempClause then x.to_goal
+        else x
+        end
+      end
+      @db.append(self.to_goal, list(*goals))
     end
 
     def fact
@@ -60,11 +66,39 @@ module RubyProlog
     end
 
     def calls(&callback)
-      @pred.defs << [self, callback]
+      @db.append(self.to_goal, callback)
+    end
+
+    def to_goal
+      Goal.new(@pred.id, @pred.name, @args.map do |arg|
+        case arg
+        when TempClause
+          arg.to_goal
+        else
+          arg
+        end
+      end)
+    end
+
+    private
+
+    def list(*x)
+      y = nil
+      x.reverse_each {|e| y = Cons.new(e, y)}
+      return y
+    end
+  end
+
+  class Goal
+
+    attr_reader :pred_id, :pred_name, :args
+
+    def initialize(pred_id, pred_name, args)
+      @pred_id, @pred_name, @args = pred_id, pred_name, args
     end
 
     def inspect
-      return @pred.inspect.to_s + @args.inspect.to_s
+      return @pred_name.to_s + @args.inspect.to_s
     end
 
     def to_prolog
@@ -87,10 +121,10 @@ module RubyProlog
         end
       end.join(', ')
 
-      if @pred.name == :not_
+      if @pred_name == :not_
         "\\+ #{args_out}"
       else
-        "#{@pred.name}(#{args_out})"
+        "#{@pred_name}(#{args_out})"
       end
     end
   end
@@ -183,7 +217,7 @@ module RubyProlog
     def [](t)
       t, env = dereference(t)
       return case t
-             when Goal then Goal.new(t.pred, env[t.args])
+             when Goal then Goal.new(t.pred_id, t.pred_name, env[t.args])
              when Cons then Cons.new(env[t[0]], env[t[1]])
              when Array then t.collect {|e| env[e]}
              else t
@@ -209,6 +243,53 @@ module RubyProlog
       return @core._unify(t, @env, u, @env, @trail, @env)
     end
 
+  end
+
+
+  class Database
+    attr_reader :by_name, :by_id
+
+    def initialize
+      @by_name = {}
+      @by_id = {}
+      @listing_enabled = false
+      @listing = {}
+    end
+
+    def register(pred_name, skip_listing: false)
+      pred = @by_name[pred_name] = Predicate.new(self, pred_name)
+      @by_id[pred.id] = pred
+      @listing[pred.id] = false if skip_listing
+      pred
+    end
+
+    def enable_listing(flag=true)
+      @listing_enabled = true
+    end
+
+    def append(head, body)
+      pred = @by_id[head.pred_id]
+      if pred.nil?
+        raise "No such predicate for head: #{head.inspect}"
+      end
+      pred.clauses << [head, body]
+      if @listing_enabled && @listing[pred.id] != false
+        # Ruby hashes maintain insertion order
+        @listing[pred.id] = true
+      end
+    end
+
+    def initialize_copy(orig)
+      super
+      @by_id = @by_id.transform_values do |pred|
+        pred.fork(self)
+      end
+      @by_name = @by_name.transform_values {|pred| @by_id[pred.id]}
+    end
+
+    def listing
+      @listing.select{|_,v| v}.map{|k,v| @by_id[k]}
+    end
   end
 
 
@@ -238,7 +319,7 @@ module RubyProlog
       }
 
       if Goal === x and Goal === y
-        return false unless x.pred == y.pred
+        return false unless x.pred_id == y.pred_id
         x, y = x.args, y.args
       end
 
@@ -283,11 +364,7 @@ module RubyProlog
         else
           d_env = Environment.new
           d_cut = [false]
-          require 'pp'
-          # pp 'G ' + goal.class.to_s
-          # pp goal.pred
-          for d_head, d_body in goal.pred.defs
-          # for d_head, d_body in goal.defs
+          for d_head, d_body in @db.by_id[goal.pred_id].clauses
             break if d_cut[0] or cut[0]
             trail = []
             if _unify_(goal, env, d_head, d_env, trail, d_env)
@@ -335,9 +412,7 @@ module RubyProlog
       goals = [goals] unless goals.is_a?(Array)
       results = []
 
-      resolve(*goals) {|env|
-        puts "Found solution: #{env[goals]}" if $trace
-        # puts env.instance_variable_get :@table
+      resolve(*goals.map(&:to_goal)) {|env|
         results << env.solution
       }
       return results
@@ -346,7 +421,7 @@ module RubyProlog
 
     def is(*syms,&block)
       $is_cnt ||= 0
-      is = Predicate.new "IS_#{$is_cnt += 1}"
+      is = @db.register("IS_#{$is_cnt += 1}", skip_listing: true)
       raise "At least one symbol needed" unless syms.size > 0
       is[*syms].calls do |env|
         value = block.call(*syms[1..-1].map{|x| env[x]})
@@ -356,23 +431,21 @@ module RubyProlog
     end
 
     def method_missing(meth, *args)
-      pred = Predicate.new(meth)
+      pred = @db.register(meth)
 
       # We only want to define the method on this specific object instance to avoid polluting global namespaces.
-      define_singleton_method(meth){ pred }
+      define_singleton_method(meth){ @db.by_name[meth] }
 
-      @listing << pred unless @listing.nil?
-
-      return pred
+      pred
     end
 
     def to_prolog
-      @listing.map{|pred| pred.to_prolog}.join('\n\n')
+      @db.listing.map(&:to_prolog).join('\n\n')
     end
 
 
     def initialize
-      @listing = nil
+      @db = Database.new
       # These predicates are made available in all environments
       write[:X].calls{|env| print env[:X]; true}
       writenl[:X].calls{|env| puts env[:X]; true}
@@ -399,10 +472,14 @@ module RubyProlog
         found_solution == false
       end
 
-      # Define this at the end so the above predicates don't make it in
-      @listing = []
+      # Enable here so the predicates above don't make it in to_prolog output
+      @db.enable_listing
     end
 
+    def initialize_copy(orig)
+      super
+      @db = @db.clone
+    end
   end
 
 end

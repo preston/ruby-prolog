@@ -49,6 +49,35 @@ describe RubyProlog do
     _(one.to_prolog.class).must_equal String
   end
 
+  it 'considers all predicates dynamic' do
+    one = RubyProlog::Core.new
+    one.instance_eval do
+      foo[10] << [bar[20]]
+    end
+    _( one.query {_= foo[:X] } ).must_equal []
+  end
+
+  it 'supports clone' do
+    one = RubyProlog::Core.new
+    one.instance_eval do
+      foo[10].fact
+    end
+    _( one.query {_= foo[:X] } ).must_equal [{X: 10}]
+
+    two = one.clone
+    _( one.query {_= foo[:X] } ).must_equal [{X: 10}]
+    _( two.query {_= foo[:X] } ).must_equal [{X: 10}]
+
+    one.instance_eval{ foo[20].fact }
+
+    _( one.query {_= foo[:X] } ).must_equal [{X: 10}, {X: 20}]
+    _( two.query {_= foo[:X] } ).must_equal [{X: 10}]
+
+    two.instance_eval{ foo[30].fact }
+    _( one.query {_= foo[:X] } ).must_equal [{X: 10}, {X: 20}]
+    _( two.query {_= foo[:X] } ).must_equal [{X: 10}, {X: 30}]
+  end
+
   it 'should be able to query simple family trees.' do
 
     c = RubyProlog::Core.new
