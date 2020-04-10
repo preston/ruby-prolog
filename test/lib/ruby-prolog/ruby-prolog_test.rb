@@ -90,6 +90,22 @@ describe RubyProlog do
     _( two.query {_= foo[:X] } ).must_equal [{X: 10}, {X: 30}]
   end
 
+  it 'supports false' do
+    db = RubyProlog.new do
+      foo[:_] << [false]
+      foo['x'].fact
+
+      bar[:_] << [:CUT, false]
+      bar['x'].fact
+
+      baz[false].fact
+    end
+
+    _( db.query{ foo['x'] } ).must_equal [{}]
+    _( db.query{ bar['x'] } ).must_equal []
+    _( db.query{ baz[false] } ).must_equal [{}]
+  end
+
   it 'should be able to query simple family trees.' do
 
     c = RubyProlog.new do

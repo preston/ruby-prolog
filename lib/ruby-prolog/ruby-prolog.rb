@@ -14,8 +14,8 @@ module RubyProlog
     attr_reader :id, :name
     attr_accessor :db, :clauses
 
-    def initialize(db, name)
-      @id = (@@id_counter += 1)
+    def initialize(db, name, explicit_id: nil)
+      @id = explicit_id || (@@id_counter += 1)
       @db = db
       @name = name
       @clauses = []
@@ -52,6 +52,7 @@ module RubyProlog
       goals = rhs.map do |x|
         case x
         when TempClause then x.to_goal
+        when false then Goal.new(0, 'false', [])
         else x
         end
       end
@@ -259,8 +260,12 @@ module RubyProlog
     attr_reader :by_name, :by_id
 
     def initialize
-      @by_name = {}
-      @by_id = {}
+      @by_name = {
+        'false' => Predicate.new(self, 'false', explicit_id: 0)
+      }
+      @by_id = {
+        0 => @by_name['false']
+      }
       @listing_enabled = false
       @listing = {}
     end
