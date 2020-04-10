@@ -89,6 +89,37 @@ end
 
 This will mutate your database. If you want to "fork" your database instead, you can call `db.clone`, which will return a new instance with all stored data. Cloning like this is optimized to copy as little as possible.
 
+### `to_prolog`
+
+If you're loading rules from a database, you might be generating predicates like this:
+
+```rb
+rules = Ruleset.find_by(org: ...).rules
+db = RubyProlog.new do
+  rules['permissions'].map do |role, perm|
+    permission[role, perm].fact
+  end
+end
+```
+
+However, if something doesn't work, how do find out why?
+
+This is where `#to_prolog` comes in handy. Just run it on your instance:
+
+```rb
+puts db.to_prolog
+```
+
+and you'll get something that looks like this:
+
+```text
+permission('admin', 'invite').
+permission('admin', 'ban').
+permission('membe', 'create_post').
+```
+
+Then you can do a quick copy/paste into an environment like [Tau Prolog's sandbox](http://tau-prolog.org/sandbox/) or [SWISH](https://swish.swi-prolog.org) and run some queries.
+
 Examples
 ----
 
