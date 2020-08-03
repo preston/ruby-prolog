@@ -320,4 +320,21 @@ describe RubyProlog do
     _( db.query{_= implies['a', 'd'] } ).must_equal [{}]
     _( db.query{_= implies['a', 'idontexist'] } ).must_equal []
   end
+
+  it 'supports zero-arity predicates' do
+    db = RubyProlog.new do
+      data['a'].fact
+      foo_1[] << data['a']
+      bar_1[].fact
+
+      foo_2 << data['b']
+      bar_2.fact
+    end
+
+    _( db.query{ foo_1[] } ).must_equal [{}]
+    _( db.query{ bar_1[] } ).must_equal [{}]
+
+    _( db.query{ foo_2 } ).must_equal []
+    _( db.query{ bar_2 } ).must_equal [{}]
+  end
 end

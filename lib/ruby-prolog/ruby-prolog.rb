@@ -22,11 +22,11 @@ module RubyProlog
     end
 
     def inspect
-      return @name.to_s
+      @name.to_s
     end
 
     def [](*args)
-      return TempClause.new(@db, self, args)
+      TempClause.new(@db, self, args)
     end
 
     def to_prolog
@@ -41,6 +41,13 @@ module RubyProlog
       dupe.clauses = dupe.clauses.dup
       dupe
     end
+
+    #
+    # DSL for 0-arity predicates
+    #
+    def <<(goals); TempClause.new(@db, self, []) << goals; end
+    def to_goal; TempClause.new(@db, self, []).to_goal; end
+    def fact; TempClause.new(@db, self, []).fact; end
   end
 
   class TempClause
