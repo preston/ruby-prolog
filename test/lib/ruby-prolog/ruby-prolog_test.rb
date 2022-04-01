@@ -1,7 +1,6 @@
+#!/usr/bin/env ruby
 
 require_relative '../../test_helper'
-
-
 
 describe RubyProlog do
 
