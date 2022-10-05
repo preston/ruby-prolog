@@ -1,7 +1,9 @@
-ruby-prolog
-====
+# ruby-prolog :: The Prolog-like DSL for Ruby
+
 
 ruby-prolog allows you to solve complex logic problems on the fly using a dynamic, Prolog-like DSL inline with your normal Ruby code. Basic use is encompassed by stating basic facts using your data, defining rules, and then asking questions. Why is this cool? Because ruby-prolog allows you to leave your normal object-oriented vortex on demand and step into the alternate reality of declarative languages.
+
+ruby-prolog has been used in projects ranging from complex realtime access control authorization in Rails apps, to headless 3D layout engines, and many other use cases.
 
 With ruby-prolog:
 
@@ -10,9 +12,9 @@ With ruby-prolog:
 * There are no variables.
 * There are no control flow statements.
 
-You *can* use all these wonder things -- it’s still Ruby after all -- but they’re not needed, and mainly useful for getting data and results into/out of the interpreter. Prolog still tends to be favored heavily in artificial intelligence and theorem proving applications and is still relevant to computer science curricula as well, so I hope this updated release proves useful for your logic evaluation needs!
+You *can* use all these wonder things -- it’s still Ruby after all -- but they’re not needed, and mainly useful for getting data and results into/out of the interpreter. Declarative langugaes like Prolog are often favored heavily in artificial intelligence and theorem proving applications and is also taught in computer science curricula, so I hope this updated release proves useful for your logic evaluation needs!
 
-ruby-prolog is written using object-oriented-ish pure Ruby, and should work under all most popular Ruby interpreters. Please report compatibility problems. The core engine is largely based on tiny_prolog, though numerous additional enhancements have been made such as object-oriented refactorings and integration of ideas from the interwebs. Unfortunately I cannot read Japanese and cannot give proper attribution to the original tiny_prolog author. (If *you* can, let me know and I'll update this document!)
+ruby-prolog is written using object-oriented-ish pure Ruby, and should work under all modern Ruby interpreters. Please report compatibility problems. The core engine is largely based on tiny_prolog, though numerous additional enhancements have been made such as object-oriented refactorings and integration of ideas from the interwebs. Unfortunately I cannot read Japanese and cannot give proper attribution to the original tiny_prolog author. (If *you* can, let me know and I'll update this document!)
 
 Usage
 ----
@@ -162,4 +164,4 @@ $ rake test
 License
 ----
 
-Released under the Apache 2 license. Copyright (c) 2013 Preston Lee. All rights reserved. http://prestonlee.com
+Released under the Apache 2.0 license. Copyright (c) 2013-2022 Preston Lee. All rights reserved. https://prestonlee.com
