@@ -5,6 +5,9 @@ ruby-prolog allows you to solve complex logic problems on the fly using a dynami
 
 ruby-prolog has been used in projects ranging from complex realtime access control authorization in Rails apps, to headless 3D layout engines, and many other use cases.
 
+* Example: [Dynamic Access Control for IAM](bin/ruby-prolog-acls)
+* Example: [Towers of Hanoi solution](bin/ruby-prolog-hanoi)
+
 With ruby-prolog:
 
 * There are no classes.
