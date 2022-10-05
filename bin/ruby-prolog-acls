@@ -60,26 +60,26 @@ c.instance_eval do
   # , noteq[:P1, :P2]
   
   puts 'Who does QA?'
-  p query(assigned[:U, :P, 'qa'])
+  p query{assigned[:U, :P, 'qa']}
     
   puts "Who can access the 'vista' project?"
-  p query(can_on_project[:U, 'read', 'vista'])
+  p query{(can_on_project[:U, 'read', 'vista'])}
   
   puts "Does Alice have delete privileges on Vista?"
-  puts query(can_on_project['alice', 'delete', 'vista']).empty? ? "Yes" : "No"
+  puts query{can_on_project['alice', 'delete', 'vista']}.empty? ? "Yes" : "No"
 
   puts "Does Bob have delete privileges on Vista?"
-  puts query(can_on_project['bob', 'delete', 'vista']).empty? ? "Yes" : "No"
+  puts query{can_on_project['bob', 'delete', 'vista']}.empty? ? "Yes" : "No"
   
   puts "Who is an admin on multiple projects?"
-  # p query(is_role_on_multiple_projects[:U, 'admin'])
+  # puts query{is_role_on_multiple_projects[:U, 'admin']}
   
+  require 'JSON'
   s = Array.new
-  query(is_role_on_multiple_projects[:U, 'admin']).each do |r|
-    s |= [r[0].args[0]] # Put each result into the array, if not already present.
+  query{is_role_on_multiple_projects[:U, 'admin']}.each do |r|
+    # puts r[:U].to_json
+    s |= [r[:U]] # Put each result into the array, if not already present.
   end
-  s.each do |n| puts n end # Print all unique results!
-  
-  
+  s.each do |n| puts n end # Print all unique results!  
 
 end

@@ -28,10 +28,10 @@ c.instance_eval do
    hanoi[:N] <<  move[:N,"left","right","center"]
 
    puts "\nWhat's the solution for a single disc?"
-   query(hanoi[1])
+   query{hanoi[1]}
 
    puts "\n\nWhat's the solution for 5 discs?"
-   query(hanoi[5])
+   query{hanoi[5]}
    
    # do_stuff[:STUFF].calls{|env| print env[:STUFF]; true}
     
