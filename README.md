@@ -167,4 +167,4 @@ $ rake test
 License
 ----
 
-Released under the Apache 2.0 license. Copyright (c) 2013-2022 Preston Lee. All rights reserved. https://prestonlee.com
+Released under the Apache 2.0 license. Copyright (c) 2013-2025 Preston Lee. All rights reserved. https://prestonlee.com
